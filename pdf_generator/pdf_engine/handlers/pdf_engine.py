@@ -85,7 +85,7 @@ class PDFTemplateEngine:
             parent=self.styles['Normal'],
             fontSize=10,
             textColor=colors.darkgray,
-            alignment=1  # Center alignment
+            alignment=0  # Center alignment
         )
         self.custom_styles['contact'] = contact_style
 
@@ -109,6 +109,112 @@ class PDFTemplateEngine:
             spaceAfter=3
         )
         self.custom_styles['job_title'] = job_title_style
+
+        title_style = ParagraphStyle(
+            'TitleStyle',
+            parent=self.styles['Title'],
+            fontSize=24,
+            leading=28,  # Line height
+            textColor=colors.darkblue,
+            spaceAfter=12,
+            alignment=1  # Center alignment
+        )
+        self.custom_styles['title'] = title_style
+
+        # Subtitle Style
+        subtitle_style = ParagraphStyle(
+            'SubtitleStyle',
+            parent=self.styles['Heading2'],
+            fontSize=18,
+            textColor=colors.darkgreen,
+            spaceAfter=10,
+            alignment=0  # Left alignment
+        )
+        self.custom_styles['subtitle'] = subtitle_style
+
+        # Section Header Style
+        section_header_style = ParagraphStyle(
+            'SectionHeaderStyle',
+            parent=self.styles['Heading3'],
+            fontSize=14,
+            textColor=colors.navy,
+            underline=True,
+            spaceAfter=6
+        )
+        self.custom_styles['section_header'] = section_header_style
+
+        # Subtext Style (Generic Gray Text)
+        sub_text_gray_style = ParagraphStyle(
+            'SubTextGray',
+            parent=self.styles['Normal'],
+            fontSize=10,
+            textColor=colors.gray,
+            leading=12,
+            spaceAfter=4
+        )
+        self.custom_styles['sub_text_gray'] = sub_text_gray_style
+
+        # Highlighted Text Style
+        highlighted_text_style = ParagraphStyle(
+            'HighlightedText',
+            parent=self.styles['Normal'],
+            fontSize=12,
+            textColor=colors.red,
+            backColor=colors.yellow,
+            spaceAfter=6
+        )
+        self.custom_styles['highlighted_text'] = highlighted_text_style
+
+        # Bullet List Item Style
+        bullet_list_style = ParagraphStyle(
+            'BulletList',
+            parent=self.styles['Normal'],
+            fontSize=12,
+            textColor=colors.black,
+            leftIndent=20,  # Indent for bullets
+            spaceBefore=2,
+            spaceAfter=2
+        )
+        self.custom_styles['bullet_list'] = bullet_list_style
+
+        # Centered Text Style
+        centered_text_style = ParagraphStyle(
+            'CenteredText',
+            parent=self.styles['Normal'],
+            fontSize=12,
+            textColor=colors.black,
+            alignment=1  # Center alignment
+        )
+        self.custom_styles['centered_text'] = centered_text_style
+
+        # Justified Text Style
+        justified_text_style = ParagraphStyle(
+            'JustifiedText',
+            parent=self.styles['Normal'],
+            fontSize=12,
+            textColor=colors.black,
+            alignment=4  # Justified alignment
+        )
+        self.custom_styles['justified_text'] = justified_text_style
+
+        # Small Caps Style
+        small_caps_style = ParagraphStyle(
+            'SmallCaps',
+            parent=self.styles['Normal'],
+            fontSize=10,
+            textColor=colors.black,
+            spaceAfter=4,
+            textTransform='uppercase'
+        )
+        self.custom_styles['small_caps'] = small_caps_style
+
+    def update_styles(self, title_color=None, section_color=None):
+        if title_color:
+            self.custom_styles['name'].textColor = title_color
+
+        if section_color:
+            self.custom_styles['section_header'].textColor = section_color
+            self.custom_styles['section_header'].borderBottomColor = section_color
 
     def add_text(self,
                  text: str,
@@ -236,7 +342,7 @@ class PDFTemplateEngine:
         """
         from reportlab.platypus import Spacer
 
-        self.elements.append(Paragraph("Professional Experience", self.custom_styles['section']))
+        # self.elements.append(Paragraph("Professional Experience", self.custom_styles['section']))
 
         for exp in experiences:
             # Job Title and Company
@@ -258,12 +364,6 @@ class PDFTemplateEngine:
             self.elements.append(Spacer(1, 0.2 * inch))
 
     def add_education(self, education_details: List[Dict]):
-        """
-        Add education section
-
-        :param education_details: List of education experiences
-        """
-        self.elements.append(Paragraph("Education", self.custom_styles['section']))
 
         for edu in education_details:
             # Degree and Institution
@@ -303,6 +403,21 @@ class PDFTemplateEngine:
         ]))
 
         self.elements.append(skill_table)
+
+    def add_skills_bullet(self, skills: List[str]):
+        """
+        Add skills section with a bullet list layout.
+
+        :param skills: List of skills
+        """
+        # Add the section title
+
+        # Add each skill as a bullet point
+        for skill in skills:
+            self.elements.append(Paragraph(f"• {skill}", self.styles['Bullet']))
+
+        # Add spacing after the section
+        self.elements.append(Spacer(1, 0.2 * inch))
 
     def add_table(self,
                   data: List[List[str]],
@@ -354,7 +469,6 @@ class PDFTemplateEngine:
         return self.filename
 
 # Example Usage Demonstrations
-
 
 
 def quote_generator_example():
@@ -472,3 +586,102 @@ def create_sample_resume():
 
     # Generate Resume
     resume.generate()
+
+def create_sample_resume_2():
+    """
+    Generates a sample resume for John Doe using the PDFTemplateEngine.
+    """
+    # Initialize the PDF generator with a filename
+    resume = PDFTemplateEngine('john_doe_resume.pdf')
+
+    resume.update_styles(
+        title_color=colors.green,  # Custom title color
+        section_color=colors.red   # Custom section color
+    )
+
+    # Add Personal Information
+    resume.add_personal_info(
+        name="John Doe",
+        contact_info={
+            'email': 'john.doe@example.com',
+            'phone': '+1 (123) 456-7890',
+            'linkedin': 'https://linkedin.com/in/johndoe',
+            'website': 'https://johndoe.com'
+        }
+    )
+
+    # Add a Professional Summary
+    resume.add_text(
+        "Professional Summary",
+        style='section_header',
+        space_after=0.2 * inch
+    )
+    resume.add_text(
+        "Innovative software engineer with 5+ years of experience "
+        "in developing scalable web applications and microservices. "
+        "Proven track record of leading projects and optimizing system performance.",
+        style='justified_text'
+    )
+
+    # Add Professional Experience
+    resume.add_text("Professional Experience", style='section_header', space_after=0.2 * inch)
+    resume.add_experience([
+        {
+            'title': 'Senior Software Engineer',
+            'company': 'TechCorp Inc.',
+            'start_date': 'Jan 2020',
+            'end_date': 'Present',
+            'location': 'San Francisco, CA',
+            'achievements': [
+                'Led development of microservices architecture.',
+                'Reduced system latency by 40% through optimization.',
+                'Mentored junior developers in agile methodologies.'
+            ]
+        },
+        {
+            'title': 'Software Engineer',
+            'company': 'StartUp Solutions',
+            'start_date': 'Jun 2017',
+            'end_date': 'Dec 2019',
+            'location': 'New York, NY',
+            'description': 'Developed and maintained full-stack web applications.'
+        }
+    ])
+
+    # Add Education
+    resume.add_text("Education", style='section_header', space_after=0.2 * inch)
+    resume.add_education([
+        {
+            'degree': 'Master of Science',
+            'field': 'Computer Science',
+            'institution': 'Stanford University',
+            'graduation_date': '2017'
+        }
+    ])
+
+    # Add Skills
+    resume.add_text("Skills", style='section_header', space_after=0.2 * inch)
+
+    resume.add_skills_bullet(
+        [
+            'Python', 'Django', 'React', 'Docker', 'Kubernetes',
+            'AWS', 'Machine Learning', 'CI/CD', 'Microservices'
+        ]
+    )
+    # resume.add_skills([
+    #     'Python', 'Django', 'React', 'Docker', 'Kubernetes',
+    #     'AWS', 'Machine Learning', 'CI/CD', 'Microservices'
+    # ])
+
+    # Add a Page Break and Additional Section
+    resume.add_page_break()
+    resume.add_text("Additional Information", style='section_header', space_after=0.2 * inch)
+    resume.add_text(
+        "Available for remote opportunities and willing to relocate. "
+        "Passionate about mentoring and open-source contributions.",
+        style='justified_text'
+    )
+
+    # Generate the final PDF
+    resume.generate()
+    print("Resume generated successfully as 'john_doe_resume.pdf'")
