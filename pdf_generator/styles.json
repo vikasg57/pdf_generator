@@ -1,0 +1,16 @@
+{
+  "title_color": "#800080",
+  "section_color": "#800080",
+  "font_sizes": {
+    "title": 20,
+    "section_header": 14,
+    "normal": 10,
+    "subtitle": 12
+  },
+  "font_styles": {
+    "title": "Helvetica-Bold",
+    "section_header": "Helvetica-Bold",
+    "normal": "Helvetica",
+    "subtitle": "Helvetica"
+  }
+}

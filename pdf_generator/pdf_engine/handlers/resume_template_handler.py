@@ -11,10 +11,7 @@ class ResumeTemplateHandler:
         resume = ResumeGenerator(name)
 
         # Initialize the PDF generator with a filename
-        resume.update_styles(
-            title_color=colors.black,  # Custom title color
-            section_color=colors.black  # Custom section color
-        )
+        resume.load_styles_from_config('styles.json')
 
         # Add Personal Information
         resume.add_personal_info(
@@ -76,7 +73,7 @@ class ResumeTemplateHandler:
         )
 
         # Add a Page Break and Additional Section
-        resume.add_page_break()
+        # resume.add_page_break()
 
         resume.add_additional_info(
             "Available for remote opportunities and willing to relocate. "

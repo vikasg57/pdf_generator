@@ -45,12 +45,13 @@ class ResumeGenerator:
         """
         from reportlab.platypus import Spacer
 
-        self.resume.add_text("Professional Experience", style='section_header', space_after=0.2 * inch)
+        self.resume.elements.append(
+            Paragraph("Professional Experience", self.resume.custom_styles['section_header']))
 
         for exp in experiences:
             # Job Title and Company
             job_title_text = f"{exp['title']} at {exp['company']}"
-            self.resume.elements.append(Paragraph(job_title_text, self.resume.custom_styles['job_title']))
+            self.resume.elements.append(Paragraph(job_title_text, self.resume.custom_styles['subtitle']))
 
             # Duration and Location
             duration_text = f"{exp['start_date']} - {exp.get('end_date', 'Present')} | {exp.get('location', 'Remote')}"
@@ -68,12 +69,15 @@ class ResumeGenerator:
 
     def add_education(self, education_details: List[Dict]):
 
-        self.resume.add_text("Education", style='section_header', space_after=0.2 * inch)
+        self.resume.elements.append(
+            Paragraph("Education", self.resume.custom_styles['section_header']))
+
+        # self.resume.add_text("Education", style='section_header', space_after=0.2 * inch)
 
         for edu in education_details:
             # Degree and Institution
             degree_text = f"{edu['degree']} in {edu['field']}"
-            self.resume.elements.append(Paragraph(degree_text, self.resume.custom_styles['job_title']))
+            self.resume.elements.append(Paragraph(degree_text, self.resume.custom_styles['subtitle']))
 
             # Institution and Graduation
             inst_text = f"{edu['institution']} | Graduated: {edu.get('graduation_date', 'Present')}"
@@ -104,7 +108,8 @@ class ResumeGenerator:
         self.resume.elements.append(skill_table)
 
     def add_skills_bullet(self, skills: List[str]):
-        self.resume.add_text("Skills", style='section_header', space_after=0.2 * inch)
+        self.resume.elements.append(
+            Paragraph("Skills", self.resume.custom_styles['section_header']))
         for skill in skills:
             self.resume.elements.append(Paragraph(f"• {skill}", self.resume.styles['Bullet']))
 
@@ -113,15 +118,14 @@ class ResumeGenerator:
 
     def add_summary(self, summary_text: str):
         self.resume.elements.append(
-            Paragraph("Professional Summary", self.resume.custom_styles['section']))
+            Paragraph("Professional Summary", self.resume.custom_styles['section_header']))
         self.resume.elements.append(
             Paragraph(summary_text, self.resume.styles['Normal']))
 
     def add_additional_info(self, additional_info: str):
-        self.resume.add_text("Additional Information", style='section_header', space_after=0.2 * inch)
+        self.resume.elements.append(
+            Paragraph("Additional Information", self.resume.custom_styles['section_header']))
         self.resume.add_text(
             additional_info,
             style='justified_text'
         )
-
-

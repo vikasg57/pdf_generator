@@ -1,4 +1,6 @@
 import io
+import json
+from reportlab.lib.colors import HexColor
 from typing import List, Dict
 from reportlab.lib.pagesizes import letter, A4
 from reportlab.lib import colors
@@ -69,6 +71,15 @@ class PDFTemplateEngine:
         # )
         # self.custom_styles[name] = custom_style
 
+        # job_title_style = ParagraphStyle(
+        #     'JobTitleStyle',
+        #     parent=self.styles['Normal'],
+        #     fontSize=12,
+        #     textColor=colors.darkgreen,
+        #     spaceAfter=3
+        # )
+        # self.custom_styles['job_title'] = job_title_style
+
         name_style = ParagraphStyle(
             'NameStyle',
             parent=self.styles['Title'],
@@ -100,16 +111,6 @@ class PDFTemplateEngine:
         )
         self.custom_styles['section'] = section_style
 
-        # Job Title Style
-        job_title_style = ParagraphStyle(
-            'JobTitleStyle',
-            parent=self.styles['Normal'],
-            fontSize=12,
-            textColor=colors.darkgreen,
-            spaceAfter=3
-        )
-        self.custom_styles['job_title'] = job_title_style
-
         title_style = ParagraphStyle(
             'TitleStyle',
             parent=self.styles['Title'],
@@ -124,11 +125,10 @@ class PDFTemplateEngine:
         # Subtitle Style
         subtitle_style = ParagraphStyle(
             'SubtitleStyle',
-            parent=self.styles['Heading2'],
-            fontSize=18,
+            parent=self.styles['Normal'],
+            fontSize=12,
             textColor=colors.darkgreen,
-            spaceAfter=10,
-            alignment=0  # Left alignment
+            spaceAfter=3
         )
         self.custom_styles['subtitle'] = subtitle_style
 
@@ -207,6 +207,41 @@ class PDFTemplateEngine:
             textTransform='uppercase'
         )
         self.custom_styles['small_caps'] = small_caps_style
+
+    def load_styles_from_config(self, config_path: str):
+        """
+        Load styles from a JSON configuration file.
+        """
+        with open(config_path, 'r') as f:
+            config = json.load(f)
+
+        # Parse colors
+        title_color = HexColor(config.get("title_color", "#000000"))
+        section_color = HexColor(config.get("section_color", "#000000"))
+
+        # Parse font sizes and styles
+        font_sizes = config.get("font_sizes", {})
+        font_styles = config.get("font_styles", {})
+
+
+        self.custom_styles['name'].textColor = title_color
+
+        self.custom_styles['section_header'].textColor = section_color
+        self.custom_styles['section_header'].borderBottomColor = section_color
+
+        # Update other properties in custom styles
+        self.custom_styles['name'].fontName = font_styles.get("title", "Helvetica-Bold")
+        self.custom_styles['name'].fontSize = font_sizes.get("title", 18)
+
+        self.custom_styles['section'].fontName = font_styles.get("section_header", "Helvetica-Bold")
+        self.custom_styles['section'].fontSize = font_sizes.get("section_header", 14)
+
+        # Update default Normal style
+        self.styles['Normal'].fontName = font_styles.get("normal", "Helvetica")
+        self.styles['Normal'].fontSize = font_sizes.get("normal", 12)
+
+        self.custom_styles['subtitle'].fontName = font_styles.get("subtitle", "Helvetica")
+        self.custom_styles['subtitle'].fontSize = font_sizes.get("subtitle", 12)
 
     def update_styles(self, title_color=None, section_color=None):
         if title_color:
