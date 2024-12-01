@@ -208,12 +208,21 @@ class PDFTemplateEngine:
         )
         self.custom_styles['small_caps'] = small_caps_style
 
-    def load_styles_from_config(self, config_path: str):
+        link_style = ParagraphStyle(
+            'LinkStyle',
+            parent=self.styles['Normal'],
+            textColor=colors.blue,
+            underline=True
+        )
+        self.custom_styles['link'] = link_style
+
+    def load_styles_from_config(self, config_path: str, style_name):
         """
         Load styles from a JSON configuration file.
         """
         with open(config_path, 'r') as f:
-            config = json.load(f)
+            config_file = json.load(f)
+        config = config_file.get(style_name)
 
         # Parse colors
         title_color = HexColor(config.get("title_color", "#000000"))
@@ -222,7 +231,6 @@ class PDFTemplateEngine:
         # Parse font sizes and styles
         font_sizes = config.get("font_sizes", {})
         font_styles = config.get("font_styles", {})
-
 
         self.custom_styles['name'].textColor = title_color
 
@@ -243,18 +251,10 @@ class PDFTemplateEngine:
         self.custom_styles['subtitle'].fontName = font_styles.get("subtitle", "Helvetica")
         self.custom_styles['subtitle'].fontSize = font_sizes.get("subtitle", 12)
 
-    def update_styles(self, title_color=None, section_color=None):
-        if title_color:
-            self.custom_styles['name'].textColor = title_color
-
-        if section_color:
-            self.custom_styles['section_header'].textColor = section_color
-            self.custom_styles['section_header'].borderBottomColor = section_color
-
     def add_text(self,
                  text: str,
                  style: str = 'Normal',
-                 space_after: float = 0.2 *inch):
+                 space_after: float = 0.1 *inch):
         """
         Add formatted text paragraph
 
@@ -272,7 +272,8 @@ class PDFTemplateEngine:
 
         # Add optional spacing
         if space_after:
-            self.elements.append(Spacer(1, space_after))
+            spacer = Spacer(0, space_after)
+            self.elements.append(spacer)
 
     def add_image(self,
                   image_path: str,
@@ -312,24 +313,8 @@ class PDFTemplateEngine:
         self.elements.append(img)
 
     def create_hyperlink(self, url: str, text: str = None):
-        """
-        Create a hyperlink paragraph
-
-        :param url: URL to link
-        :param text: Optional display text
-        :return: Paragraph with hyperlink
-        """
-        from reportlab.platypus import Paragraph
-
         text = text or url
-        link_style = ParagraphStyle(
-            'LinkStyle',
-            parent=self.styles['Normal'],
-            textColor=colors.blue,
-            underline=True
-        )
-        return Paragraph(f'<link href="{url}">{text}</link>', link_style)
-
+        return f'<link href="{url}">{text}</link>'
 
     def add_table(self,
                   data: List[List[str]],
@@ -379,57 +364,3 @@ class PDFTemplateEngine:
         self.doc.build(self.elements)
 
         return self.filename
-
-# Example Usage Demonstrations
-
-
-def quote_generator_example():
-    # Create PDF engine
-    pdf = PDFTemplateEngine('quote.pdf')
-
-    # Add quote details
-    pdf.add_text("Business Quote", style='Title')
-
-    # Quote details table
-    quote_data = [
-        ['Item', 'Description', 'Quantity', 'Unit Price', 'Total'],
-        ['Web Design', 'Professional Website', 1, '$1000', '$1000'],
-        ['SEO', 'Search Optimization', 1, '$500', '$500']
-    ]
-    pdf.add_table(quote_data)
-
-    # Total section
-    pdf.add_text("Total: $1500", style='Heading3')
-
-    # Generate PDF
-    pdf.generate()
-
-
-# Demonstration of how to use the engine
-if __name__ == "__main__":
-    # Create a sample PDF with custom margins and A4 size
-    pdf = PDFTemplateEngine(
-        'sample.pdf',
-        pagesize=A4,
-        margins=( 1 *inch, 1* inch, 1 * inch, 1 * inch)
-    )
-
-    # Demonstrate capabilities
-    pdf.add_text("PDF Generation Demo", style='Title')
-
-    # Add a table
-    sample_data = [
-        ['Name', 'Age', 'City'],
-        ['John Doe', '30', 'New York'],
-        ['Jane Smith', '25', 'San Francisco']
-    ]
-    pdf.add_table(sample_data)
-
-    # Add page break
-    pdf.add_page_break()
-
-    # Add another section
-    pdf.add_text("Additional Content", style='Heading2')
-
-    # Generate the PDF
-    pdf.generate()

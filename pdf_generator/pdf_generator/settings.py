@@ -25,7 +25,7 @@ SECRET_KEY = "django-insecure-y!tx#cb%jwo#b85i$=z=!46l3*bwb*of*k_h0u6_%3$s*ve+vo
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost']
 
 
 # Application definition
@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "django_extensions",
+    "base",
     "pdf_engine"
 ]
 
