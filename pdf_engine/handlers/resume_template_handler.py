@@ -31,19 +31,19 @@ class ResumeTemplateHandler:
         )
         return default_template
 
-    def apply_template(self, template: str, filename: str, style_name: str, **kwargs):
+    def apply_template(self, template: str, filename: str, json_style: str, **kwargs):
         """
         Applies a registered template to generate a resume.
         """
         if not template:
             raise ValueError(f"Template is not registered.")
         resume = ResumeGenerator(filename)
-        self.modern_template(resume, 'styles.json', style_name, **kwargs)
+        self.modern_template(resume, json_style, **kwargs)
         resume.generate()
         print(f"Resume generated successfully as '{filename}'")
 
-    def modern_template(self, resume: ResumeGenerator, file_name: str, style_name: str, **kwargs):
-        resume.load_styles_from_config(file_name, style_name)
+    def modern_template(self, resume: ResumeGenerator, json_style: str, **kwargs):
+        resume.load_styles_from_config(json_style)
         self._add_common_sections(resume, **kwargs)
 
     def _add_common_sections(self, resume: ResumeGenerator, **kwargs):
@@ -77,8 +77,8 @@ class ResumeTemplateHandler:
 
         # Build the dictionary
         resume_data = {
+            'name': resume.personal_info.name,
             'contact_info': {
-                'name': resume.personal_info.name,
                 'email': resume.personal_info.email,
                 'phone': resume.personal_info.phone,
                 'linkedin': resume.personal_info.linkedin,
@@ -115,15 +115,15 @@ class ResumeTemplateHandler:
 
         return resume_data
 
-    def create_resume(self, resume_id):
+    def create_resume(self, resume_id, template_name):
         resume = Resume.objects.get(uuid=resume_id)
         resume_data = self.resume_to_dict(resume)
         pdf_generator = ResumeTemplateHandler()
-        resume_template = pdf_generator.register_template("modern")
+        resume_template = pdf_generator.register_template(template_name)
         pdf_generator.apply_template(
             resume_template,
             f"{resume.personal_info.name}_resume.pdf",
-            "Elegant Gold Theme",
+            resume_template.style_json,
             **resume_data
         )
         return {

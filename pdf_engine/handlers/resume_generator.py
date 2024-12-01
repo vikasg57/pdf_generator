@@ -18,7 +18,8 @@ class ResumeGenerator:
         return getattr(self.resume, item)
 
     def add_personal_info(self, name: str, contact_info: Dict[str, str]):
-        self.resume.elements.append(Paragraph(name, self.resume.custom_styles['name']))
+        self.resume.add_text(name, style='name', space_after=5.0)
+        self.resume.add_horizontal_line()
         for key, value in contact_info.items():
             if key == 'email':
                 email = self.resume.create_hyperlink(f"mailto: {value}", value)
@@ -28,14 +29,16 @@ class ResumeGenerator:
                 self.resume.add_text(url, style='link', space_after=5.0)
             else:
                 self.add_text(value, space_after=5.0)
-        self.resume.elements.append(Spacer(1, 0.2 * inch))
+        self.resume.add_horizontal_line()
 
     def add_experience(self,
                        experiences: List[Dict],
-                       show_bullet_points: bool = True):
+                       show_bullet_points: bool = True,
+                       add_line_after: bool = True):
         """
         Add work experience section
 
+        :param add_line_after:
         :param experiences: List of work experiences
         :param show_bullet_points: Whether to show detailed bullet points
         """
@@ -59,11 +62,10 @@ class ResumeGenerator:
                     self.resume.elements.append(self.resume.add_text(f"• {achievement}"))
             elif 'description' in exp:
                 self.resume.elements.append(self.resume.add_text(exp['description']))
+        if add_line_after:
+            self.resume.add_horizontal_line()
 
-            # Add spacing between experiences
-            self.resume.elements.append(Spacer(1, 0.2 * inch))
-
-    def add_education(self, education_details: List[Dict]):
+    def add_education(self, education_details: List[Dict], add_line_after: bool = True):
 
         self.resume.elements.append(
             Paragraph("Education", self.resume.custom_styles['section_header']))
@@ -78,6 +80,9 @@ class ResumeGenerator:
             # Institution and Graduation
             inst_text = f"{edu['institution']} | Graduated: {edu.get('graduation_date', 'Present')}"
             self.resume.elements.append(self.resume.add_text(inst_text))
+
+        if add_line_after:
+            self.resume.add_horizontal_line()
 
     def add_skills(self, skills: List[str], columns: int = 3):
         from math import ceil
@@ -103,21 +108,26 @@ class ResumeGenerator:
 
         self.resume.elements.append(skill_table)
 
-    def add_skills_bullet(self, skills: List[str]):
+    def add_skills_bullet(self, skills: List[str], add_line_after: bool = True):
         self.resume.elements.append(
             Paragraph("Skills", self.resume.custom_styles['section_header']))
         for skill in skills:
             self.resume.elements.append(self.add_text(f"• {skill}", space_after=0.1 * inch))
 
-        # Add spacing after the section
-        self.resume.elements.append(Spacer(1, 0.2 * inch))
+        if add_line_after:
+            self.resume.add_horizontal_line()
 
-    def add_summary(self, summary_text: str):
+    def add_summary(self, summary_text: str, add_line_after: bool = True):
         self.resume.elements.append(
             Paragraph("Professional Summary", self.resume.custom_styles['section_header']))
         self.resume.add_text(summary_text)
+        if add_line_after:
+            self.resume.add_horizontal_line()
 
-    def add_additional_info(self, additional_info: str):
+    def add_additional_info(self, additional_info: str, add_line_after: bool = True):
         self.resume.elements.append(
             Paragraph("Additional Information", self.resume.custom_styles['section_header']))
         self.resume.add_text(additional_info)
+
+        if add_line_after:
+            self.resume.add_horizontal_line()

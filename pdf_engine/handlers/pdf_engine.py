@@ -15,7 +15,7 @@ from reportlab.platypus import (
     Image,
     PageBreak
 )
-from reportlab.graphics.shapes import Drawing
+from reportlab.graphics.shapes import Drawing, Line
 from PIL import Image as PILImage
 
 
@@ -216,13 +216,11 @@ class PDFTemplateEngine:
         )
         self.custom_styles['link'] = link_style
 
-    def load_styles_from_config(self, config_path: str, style_name):
+    def load_styles_from_config(self, json_style):
         """
         Load styles from a JSON configuration file.
         """
-        with open(config_path, 'r') as f:
-            config_file = json.load(f)
-        config = config_file.get(style_name)
+        config = json_style
 
         # Parse colors
         title_color = HexColor(config.get("title_color", "#000000"))
@@ -241,8 +239,8 @@ class PDFTemplateEngine:
         self.custom_styles['name'].fontName = font_styles.get("title", "Helvetica-Bold")
         self.custom_styles['name'].fontSize = font_sizes.get("title", 18)
 
-        self.custom_styles['section'].fontName = font_styles.get("section_header", "Helvetica-Bold")
-        self.custom_styles['section'].fontSize = font_sizes.get("section_header", 14)
+        self.custom_styles['section_header'].fontName = font_styles.get("section_header", "Helvetica-Bold")
+        self.custom_styles['section_header'].fontSize = font_sizes.get("section_header", 14)
 
         # Update default Normal style
         self.styles['Normal'].fontName = font_styles.get("normal", "Helvetica")
@@ -353,6 +351,28 @@ class PDFTemplateEngine:
         Add a page break to the document
         """
         self.elements.append(PageBreak())
+
+    def add_horizontal_line(self,
+                            line_color="#000000",
+                            line_thickness=1,
+                            line_width=None,
+                            space_after: float = 0.2 * inch):
+        """
+        Add a horizontal line to the document.
+
+        :param line_color: Color of the horizontal line (hex or named color).
+        :param line_thickness: Thickness of the horizontal line.
+        :param line_width: Width of the line; defaults to document width.
+        :param space_after: Space after the horizontal line.
+        """
+        line_width = line_width or self.doc.width  # Default to full document width
+        drawing = Drawing(line_width, line_thickness)
+        line = Line(0, 0, line_width, 0)  # Start at (0,0), end at (line_width,0)
+        line.strokeColor = HexColor(line_color)
+        line.strokeWidth = line_thickness
+        drawing.add(line)
+        self.elements.append(drawing)
+        # Add spacing after the line
 
     def generate(self):
         """
