@@ -1,0 +1,162 @@
+{
+  "Professional Blue Theme": {
+    "title_color": "#003366",
+    "section_color": "#336699",
+    "font_sizes": {
+      "title": 22,
+      "section_header": 16,
+      "normal": 11,
+      "subtitle": 13
+    },
+    "font_styles": {
+      "title": "Times-Bold",
+      "section_header": "Times-BoldItalic",
+      "normal": "Times-Roman",
+      "subtitle": "Times-Italic"
+    }
+  },
+  "Modern Minimalist (Gray Scale)": {
+    "title_color": "#4D4D4D",
+    "section_color": "#2E2E2E",
+    "font_sizes": {
+      "title": 24,
+      "section_header": 18,
+      "normal": 12,
+      "subtitle": 14
+    },
+    "font_styles": {
+      "title": "Helvetica-Bold",
+      "section_header": "Helvetica-Bold",
+      "normal": "Helvetica",
+      "subtitle": "Helvetica-Oblique"
+    }
+  },
+  "Vibrant Orange Theme": {
+    "title_color": "#FF4500",
+    "section_color": "#FFA500",
+    "font_sizes": {
+      "title": 20,
+      "section_header": 15,
+      "normal": 10,
+      "subtitle": 12
+    },
+    "font_styles": {
+      "title": "Helvetica-Bold",
+      "section_header": "Helvetica-Bold",
+      "normal": "Helvetica",
+      "subtitle": "Helvetica-Oblique"
+    }
+  },
+  "Sophisticated Green Theme": {
+    "title_color": "#006400",
+    "section_color": "#32CD32",
+    "font_sizes": {
+      "title": 21,
+      "section_header": 15,
+      "normal": 11,
+      "subtitle": 12
+    },
+    "font_styles": {
+      "title": "Helvetica-Bold",
+      "section_header": "Helvetica-BoldItalic",
+      "normal": "Helvetica",
+      "subtitle": "Helvetica-Oblique"
+    }
+  },
+  "Creative Purple Theme": {
+    "title_color": "#800080",
+    "section_color": "#BA55D3",
+    "font_sizes": {
+      "title": 22,
+      "section_header": 16,
+      "normal": 11,
+      "subtitle": 13
+    },
+    "font_styles": {
+      "title": "Courier-Bold",
+      "section_header": "Courier-Bold",
+      "normal": "Courier",
+      "subtitle": "Courier-Oblique"
+    }
+  },
+  "Elegant Gold Theme": {
+    "title_color": "#FFD700",
+    "section_color": "#DAA520",
+    "font_sizes": {
+      "title": 24,
+      "section_header": 18,
+      "normal": 12,
+      "subtitle": 14
+    },
+    "font_styles": {
+      "title": "Times-Bold",
+      "section_header": "Times-BoldItalic",
+      "normal": "Times-Roman",
+      "subtitle": "Times-Italic"
+    }
+  },
+  "Classic Black and White": {
+    "title_color": "#000000",
+    "section_color": "#000000",
+    "font_sizes": {
+      "title": 22,
+      "section_header": 16,
+      "normal": 10,
+      "subtitle": 12
+    },
+    "font_styles": {
+      "title": "Helvetica-Bold",
+      "section_header": "Helvetica-Bold",
+      "normal": "Helvetica",
+      "subtitle": "Helvetica"
+    }
+  },
+  "Trendy Teal Theme": {
+    "title_color": "#008080",
+    "section_color": "#40E0D0",
+    "font_sizes": {
+      "title": 23,
+      "section_header": 17,
+      "normal": 12,
+      "subtitle": 14
+    },
+    "font_styles": {
+      "title": "Helvetica-Bold",
+      "section_header": "Helvetica-BoldItalic",
+      "normal": "Helvetica",
+      "subtitle": "Helvetica-Oblique"
+    }
+  },
+  "Elegant Maroon and Beige": {
+    "title_color": "#800000",
+    "section_color": "#D2B48C",
+    "font_sizes": {
+      "title": 21,
+      "section_header": 16,
+      "normal": 11,
+      "subtitle": 12
+    },
+    "font_styles": {
+      "title": "Times-Bold",
+      "section_header": "Times-Bold",
+      "normal": "Times-Roman",
+      "subtitle": "Times-Italic"
+    }
+  },
+  "Bold Red and Gray Theme": {
+    "title_color": "#FF0000",
+    "section_color": "#696969",
+    "font_sizes": {
+      "title": 22,
+      "section_header": 16,
+      "normal": 11,
+      "subtitle": 13
+    },
+    "font_styles": {
+      "title": "Helvetica-Bold",
+      "section_header": "Helvetica-Bold",
+      "normal": "Helvetica",
+      "subtitle": "Helvetica-Oblique"
+    }
+  }
+}
