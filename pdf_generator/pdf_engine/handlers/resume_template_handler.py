@@ -7,24 +7,26 @@ class ResumeTemplateHandler:
     def register_template(self, name: str):
         default_template, _ = ResumeTemplate.objects.get_or_create(
             name=name,
-            default=False,
-            style_json={
-                "Elegant Gold Theme": {
-                    "title_color": "#FFD700",
-                    "section_color": "#DAA520",
-                    "font_sizes": {
-                        "title": 24,
-                        "section_header": 18,
-                        "normal": 12,
-                        "subtitle": 14
-                    },
-                    "font_styles": {
-                        "title": "Times-Bold",
-                        "section_header": "Times-BoldItalic",
-                        "normal": "Times-Roman",
-                        "subtitle": "Times-Italic"
+            defaults={
+                'style_json': {
+                    "Elegant Gold Theme": {
+                        "title_color": "#FFD700",
+                        "section_color": "#DAA520",
+                        "font_sizes": {
+                            "title": 24,
+                            "section_header": 18,
+                            "normal": 12,
+                            "subtitle": 14
+                        },
+                        "font_styles": {
+                            "title": "Times-Bold",
+                            "section_header": "Times-BoldItalic",
+                            "normal": "Times-Roman",
+                            "subtitle": "Times-Italic"
+                        }
                     }
                 }
+
             }
         )
         return default_template
@@ -124,3 +126,6 @@ class ResumeTemplateHandler:
             "Elegant Gold Theme",
             **resume_data
         )
+        return {
+            "message": "Resume generated successfully."
+        }

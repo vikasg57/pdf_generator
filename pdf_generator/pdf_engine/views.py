@@ -1,9 +1,13 @@
-from django.http import HttpResponse
+from rest_framework import status
 
+from base.response import APIResponse
 from base.views import AbstractAPIView
+from pdf_engine.handlers.resume_template_handler import ResumeTemplateHandler
 
 
 class PDFGeneratorView(AbstractAPIView):
 
-    def get(self, request):
-        return HttpResponse("Hello, world. You're at the pdf_generator index.")
+    def post(self, request, *args, **kwargs):
+        template_id = kwargs.get('template_id')
+        data = ResumeTemplateHandler().create_resume(template_id)
+        return APIResponse(data=data, status=status.HTTP_200_OK)

@@ -4,5 +4,5 @@ from . import views
 from .views import PDFGeneratorView
 
 urlpatterns = [
-    path("", PDFGeneratorView.as_view(), name="get_view"),
+    path("<uuid:template_id>/generate/", PDFGeneratorView.as_view(), name="get_view"),
 ]

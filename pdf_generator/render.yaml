@@ -1,0 +1,22 @@
+databases:
+  - name: pdf_generatordb
+    plan: free
+    databaseName: pdf_generator
+    user: pdf_generator
+
+services:
+  - type: web
+    plan: free
+    name: pdf_generator
+    runtime: python
+    buildCommand: "./build.sh"
+    startCommand: "python -m gunicorn pdf_generator.asgi:application -k uvicorn.workers.UvicornWorker"
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: pdf_generatordb
+          property: connectionString
+      - key: SECRET_KEY
+        generateValue: true
+      - key: WEB_CONCURRENCY
+        value: 4
