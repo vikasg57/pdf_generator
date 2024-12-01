@@ -44,10 +44,6 @@ class ResumeTemplateHandler:
         resume.load_styles_from_config(file_name, style_name)
         self._add_common_sections(resume, **kwargs)
 
-    # def classic_template(self, resume: ResumeGenerator, **kwargs):
-    #     resume.load_styles_from_config('styles.json')
-    #     self._add_common_sections(resume, **kwargs)
-
     def _add_common_sections(self, resume: ResumeGenerator, **kwargs):
         """
         Adds common sections to the resume (shared across templates).
@@ -76,10 +72,6 @@ class ResumeTemplateHandler:
         experiences = resume.resumeexperience_set.select_related('experience').order_by('position')
         education = resume.resumeeducation_set.select_related('education').order_by('position')
         skills = resume.resumeskill_set.select_related('skill').order_by('position')
-
-        print(experiences)
-        print(education)
-        print(skills)
 
         # Build the dictionary
         resume_data = {
