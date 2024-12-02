@@ -17,6 +17,9 @@ from reportlab.platypus import (
 )
 from reportlab.graphics.shapes import Drawing, Line
 from PIL import Image as PILImage
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
+from reportlab.lib.units import inch
 
 
 class PDFTemplateEngine:
@@ -384,3 +387,158 @@ class PDFTemplateEngine:
         self.doc.build(self.elements)
 
         return self.filename
+
+
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import letter
+from reportlab.lib.units import inch
+
+class TwoColumnResume:
+    def __init__(self, filename='resume.pdf'):
+        self.filename = filename
+        self.page_width, self.page_height = letter
+        self.margin = 0.5 * inch
+        self.column_gap = 0.2 * inch
+        self.column_width = (self.page_width - 2 * self.margin - self.column_gap) / 2
+        self.current_y_left = self.page_height - self.margin  # Y-position for the left column
+        self.current_y_right = self.page_height - self.margin  # Y-position for the right column
+        self.column = 0  # Start with the left column
+        self.canvas = canvas.Canvas(self.filename, pagesize=letter)
+
+    def _get_column_x(self):
+        """Calculate the starting X coordinate for the current column."""
+        return self.margin + self.column * (self.column_width + self.column_gap)
+
+    def _next_position(self, height):
+        """Determine the next position, switching column or page if needed."""
+        if self.column == 0:  # Left column
+            if self.current_y_left - height < self.margin:
+                self.column = 1  # Switch to the second column
+                self.current_y_left = self.page_height - self.margin  # Reset left column Y-position
+                if self.column > 1:  # Move to the next page if both columns are full
+                    self.canvas.showPage()
+                    self.column = 0  # Start over with the first column
+                    self.current_y_left = self.page_height - self.margin
+                    self.current_y_right = self.page_height - self.margin
+        else:  # Right column
+            if self.current_y_right - height < self.margin:
+                self.column = 0  # Switch back to the first column
+                self.current_y_right = self.page_height - self.margin  # Reset right column Y-position
+                if self.column == 0:  # If switching back to left, move to the next page
+                    self.canvas.showPage()
+
+    def add_text(self, text, font='Helvetica', size=10, line_height=12, space_after=2):
+        """Add text to the current column, handling word wrapping and column flow, with optional space after."""
+        self.canvas.setFont(font, size)
+        words = text.split(' ')
+        line = ""
+
+        for word in words:
+            test_line = f"{line} {word}".strip()
+            if self.canvas.stringWidth(test_line, font, size) > self.column_width:
+                # Render the current line and reset it
+                self._render_line(line, line_height)
+                line = word
+            else:
+                line = test_line
+
+        # Render the last line
+        if line:
+            self._render_line(line, line_height)
+
+        # Add optional space after text
+        self.current_y_left -= space_after if self.column == 0 else 0
+        self.current_y_right -= space_after if self.column == 1 else 0
+
+    def _render_line(self, line, line_height):
+        """Render a single line of text, flowing between columns/pages as needed."""
+        self._next_position(line_height)
+        x = self._get_column_x()
+        y = self.current_y_left if self.column == 0 else self.current_y_right  # Set Y for left or right column
+        self.canvas.drawString(x, y - line_height, line)
+        if self.column == 0:
+            self.current_y_left -= line_height
+        else:
+            self.current_y_right -= line_height
+
+    def draw_line(self, thickness=1):
+        """Draw a horizontal line across the current column width."""
+        x1 = self._get_column_x()
+        x2 = x1 + self.column_width
+        y = self.current_y_left if self.column == 0 else self.current_y_right
+        self.canvas.setLineWidth(thickness)
+        self.canvas.line(x1, y, x2, y)
+        if self.column == 0:
+            self.current_y_left -= thickness + 5  # Adjust spacing for the left column
+        else:
+            self.current_y_right -= thickness + 5  # Adjust spacing for the right column
+
+    def add_section(self, title, content, space_after=2):
+        """Add a section with a title and flowing content in the current column."""
+        self.add_text(title, font='Helvetica-Bold', size=12, line_height=14)
+        self.draw_line(thickness=0.5)
+        self.add_text(content, font='Helvetica', size=10, line_height=12, space_after=space_after)
+
+    def add_section_in_column(self, title, content, column=1, space_after=2):
+        """Add a section with a title and flowing content to the specified column."""
+        if column not in [1, 2]:
+            raise ValueError("Column must be 1 or 2.")
+
+        # Switch to the correct column
+        self.column = column - 1  # Column is 1 or 2, but column index is 0 or 1
+        self.add_section(title, content, space_after=space_after)
+
+    def add_paragraph(self, text, style='Normal', space_after=10):
+        """Add styled paragraph text."""
+        styles = getSampleStyleSheet()
+        style_obj = styles[style]
+        p = Paragraph(text, style_obj)
+        p_width, p_height = p.wrap(self.column_width, self.page_height)
+
+        # Adjust Y position before adding paragraph
+        self._next_position(p_height)
+        if self.column == 0:
+            y_pos = self.current_y_left
+            self.current_y_left -= p_height + space_after
+        else:
+            y_pos = self.current_y_right
+            self.current_y_right -= p_height + space_after
+
+        # Draw the paragraph
+        self.canvas.saveState()
+        p.drawOn(self.canvas, self._get_column_x(), y_pos)
+        self.canvas.restoreState()
+
+    def generate(self):
+        """Save the final PDF."""
+        self.canvas.save()
+
+
+# Example usage
+# resume = TwoColumnResume()
+#
+# # Add sections explicitly to columns
+# resume.add_section_in_column("Personal Info", "John Doe\nEmail: john.doe@example.com", column=1)
+# resume.add_section_in_column("Education", "MSc in Computer Science, Stanford University", column=2)
+# resume.add_section_in_column("Skills", "Python, Django, React, Flask", column=1)
+# resume.add_section_in_column("Experience", "Senior Software Engineer at TechCorp", column=2)
+# resume.add_section_in_column("Personal Info", "John Doe\nEmail: john.doe@example.com", column=1)
+# resume.add_section_in_column("Education", "MSc in Computer Science, Stanford University", column=2)
+# resume.add_section_in_column("Skills", "Python, Django, React, Flask", column=1)
+# resume.add_section_in_column("Experience", "Senior Software Engineer at TechCorp", column=2)
+# resume.add_section_in_column("Personal Info", "John Doe\nEmail: john.doe@example.com", column=1)
+# resume.add_section_in_column("Education", "MSc in Computer Science, Stanford University", column=2)
+# resume.add_section_in_column("Skills", "Python, Django, React, Flask", column=1)
+# resume.add_section_in_column("Experience", "Senior Software Engineer at TechCorp", column=2)
+# resume.add_section_in_column("Personal Info", "John Doe\nEmail: john.doe@example.com", column=1)
+# resume.add_section_in_column("Education", "MSc in Computer Science, Stanford University", column=2)
+# resume.add_section_in_column("Skills", "Python, Django, React, Flask", column=1)
+# resume.add_section_in_column("Experience", "Senior Software Engineer at TechCorp", column=2)
+# resume.add_section_in_column("Personal Info", "John Doe\nEmail: john.doe@example.com", column=1)
+# resume.add_section_in_column("Education", "MSc in Computer Science, Stanford University", column=2)
+# resume.add_section_in_column("Skills", "Python, Django, React, Flask", column=1)
+# resume.add_section_in_column("Experience", "Senior Software Engineer at TechCorp", column=2)
+#
+#
+# resume.generate()
+# print("Resume saved as 'resume.pdf'")
