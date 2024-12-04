@@ -8,14 +8,42 @@ from pdf_engine.handlers.pdf_engine import PDFTemplateEngine
 
 
 class ResumeGenerator:
-    def __init__(self, name):
-        self.resume = PDFTemplateEngine(name)
+    def __init__(self, name, column_layout: bool = False):
+        self.resume = PDFTemplateEngine(
+            name,
+            column_layout=column_layout
+        )
+        self.column_layout = column_layout
 
     def __getattr__(self, item):
         """
         Delegate attribute or method access to PDFTemplateEngine if not found in ResumeGenerator.
         """
         return getattr(self.resume, item)
+
+    def add_two_column_section(self,
+                               left_content: list,
+                               right_content: list = None):
+        """
+        Add content to two columns
+
+        :param left_content: Elements for the left column
+        :param right_content: Elements for the right column
+        """
+        if not self.column_layout:
+            raise ValueError("Two-column layout is not enabled")
+
+        # Add left column content
+        for element in left_content:
+            self.resume.elements.append(element)
+
+        # Switch to right column
+        self.resume.switch_column()
+
+        # Add right column content if provided
+        if right_content:
+            for element in right_content:
+                self.resume.elements.append(element)
 
     def add_personal_info(self, name: str, contact_info: Dict[str, str]):
         self.resume.add_text(name, style='name', space_after=5.0)
@@ -50,11 +78,11 @@ class ResumeGenerator:
         for exp in experiences:
             # Job Title and Company
             job_title_text = f"{exp['title']} at {exp['company']}"
-            self.resume.elements.append(self.resume.add_text(job_title_text, style='subtitle'))
+            self.resume.add_text(job_title_text, style='subtitle')
 
             # Duration and Location
             duration_text = f"{exp['start_date']} - {exp.get('end_date', 'Present')} | {exp.get('location', 'Remote')}"
-            self.resume.elements.append(self.resume.add_text(duration_text))
+            self.resume.add_text(duration_text)
 
             # Bullet Points or Description
             if show_bullet_points and 'achievements' in exp:

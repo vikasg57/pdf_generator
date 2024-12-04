@@ -31,13 +31,13 @@ class ResumeTemplateHandler:
         )
         return default_template
 
-    def apply_template(self, template: str, filename: str, json_style: str, **kwargs):
+    def apply_template(self, template: str, filename: str, json_style: str, two_column_layout=False, **kwargs):
         """
         Applies a registered template to generate a resume.
         """
         if not template:
             raise ValueError(f"Template is not registered.")
-        resume = ResumeGenerator(filename)
+        resume = ResumeGenerator(filename, column_layout=two_column_layout)
         self.modern_template(resume, json_style, **kwargs)
         resume.generate()
         print(f"Resume generated successfully as '{filename}'")
@@ -109,13 +109,15 @@ class ResumeTemplateHandler:
             ],
             'skills': [skill.skill.name for skill in skills],
             'additional_info': "Available for remote opportunities and willing to relocate. "
+                               "Passionate about mentoring and open-source contributions."
+                               "Available for remote opportunities and willing to relocate. "
                                "Passionate about mentoring and open-source contributions.",
 
         }
 
         return resume_data
 
-    def create_resume(self, resume_id, template_name):
+    def create_resume(self, resume_id, template_name, two_column_layout=False):
         resume = Resume.objects.get(uuid=resume_id)
         resume_data = self.resume_to_dict(resume)
         pdf_generator = ResumeTemplateHandler()
@@ -124,6 +126,7 @@ class ResumeTemplateHandler:
             resume_template,
             f"{resume.personal_info.name}_resume.pdf",
             resume_template.style_json,
+            two_column_layout,
             **resume_data
         )
         return {
